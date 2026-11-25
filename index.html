@@ -6,7 +6,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
   <main id="loginView" class="login-shell">
@@ -79,5 +79,5 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
   <div id="confirmModal" class="modal-backdrop hidden"><div class="modal-card"><p class="eyebrow">CONFIRM ACTION</p><h3 id="modalTitle">Are you sure?</h3><p id="modalMessage" class="muted-copy">Tindakan ini tidak dapat dibatalkan.</p><div class="modal-actions"><button id="modalCancel" class="outline-button">Cancel</button><button id="modalConfirm" class="danger-button">Confirm</button></div></div></div>
   <div id="extendModal" class="modal-backdrop hidden"><form id="extendForm" class="modal-card"><p class="eyebrow">LICENSE DURATION</p><h3>Extend license</h3><p class="muted-copy">Tambahkan masa aktif dari waktu kedaluwarsa saat ini.</p><label class="modal-field">Jumlah hari<input id="extendDays" type="number" min="1" max="3650" value="7" required></label><label class="modal-check"><input id="extendLifetime" type="checkbox"> Ubah menjadi LIFETIME</label><div class="modal-actions"><button type="button" id="extendCancel" class="outline-button">Cancel</button><button class="danger-button" type="submit">Save duration</button></div></form></div>
-  <script type="module" src="./app.js"></script>
+  <script type="module" src="/app.js"></script>
 </body></html>
