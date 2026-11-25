@@ -13,11 +13,11 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) {
 }
 
 const staticFiles = {
-  "/": ["index.html", "text/html; charset=utf-8"],
-  "/index.html": ["index.html", "text/html; charset=utf-8"],
+  "/": ["public/index.html", "text/html; charset=utf-8"],
+  "/index.html": ["public/index.html", "text/html; charset=utf-8"],
   "/app.js": ["public/app.js", "text/javascript; charset=utf-8"],
   "/config.js": ["public/config.js", "text/javascript; charset=utf-8"],
-  "/style.css": ["style.css", "text/css; charset=utf-8"]
+  "/style.css": ["public/style.css", "text/css; charset=utf-8"]
 };
 const apiRoutes = new Set(["auth", "global", "keys", "logs", "staff", "status", "verify"]);
 
