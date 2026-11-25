@@ -1,7 +1,8 @@
 import { db, requireSession, requireRole } from "./db.js";
+import { CONFIG } from "./public/config.js";
 import crypto from "node:crypto";
 
-const PRODUCTS = ["PANEL V1", "PANEL V2", "PANEL V3", "PANEL V4"];
+const PRODUCTS = new Map(CONFIG.PANEL_PRODUCTS.map(product => [product.toLowerCase(), product]));
 const makeKey = prefix => `${prefix}-${Array.from(crypto.randomBytes(12), b => "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[b % 32]).join("").match(/.{1,4}/g).join("-")}`;
 const log = (session, action, detail) => ({ sql: "INSERT INTO activity_logs(staff_id,staff_username,staff_role,action,details) VALUES(?,?,?,?,?)", args: [session.id, session.username, session.role, action, detail] });
 const revision = { sql: "UPDATE system_state SET revision=revision+1,updated_at=CURRENT_TIMESTAMP WHERE id=1", args: [] };
@@ -17,10 +18,15 @@ export default async function handler(req, res) {
     const body = req.body || {};
     if (req.method === "POST") {
       if (!requireRole(session, ["super_owner", "owner", "reseller"], res)) return;
-      const username = String(body.username || "").trim().slice(0, 80), product = String(body.product || "");
+      const username = typeof body.username === "string" ? body.username.trim().slice(0, 80) : "";
+      const productInput = typeof body.product === "string" ? body.product.trim() : "";
+      const product = PRODUCTS.get(productInput.toLowerCase());
       const prefix = String(body.prefix || "NX").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8) || "NX";
-      const lifetime = body.duration === "lifetime", days = Number(body.days || body.duration);
-      if (!username || !PRODUCTS.includes(product) || (!lifetime && (!Number.isInteger(days) || days < 1 || days > 3650))) return res.status(400).json({ error: "Periksa nama user, produk, dan durasi." });
+      const lifetime = body.duration === "lifetime";
+      const days = Number(body.days || body.duration);
+      if (!username) return res.status(400).json({ error: "Nama user wajib diisi." });
+      if (!product) return res.status(400).json({ error: "Produk tidak valid. Pilih produk dari daftar." });
+      if (!lifetime && (!Number.isInteger(days) || days < 1 || days > 3650)) return res.status(400).json({ error: "Durasi harus antara 1 dan 3650 hari." });
       const key = body.customKey ? String(body.customKey).trim().toUpperCase() : makeKey(prefix);
       if (!/^[A-Z0-9]{2,8}(?:-[A-Z0-9]{4}){3}$/.test(key)) return res.status(400).json({ error: "Format custom key harus PREFIX-XXXX-XXXX-XXXX." });
       const expiry = lifetime ? null : new Date(Date.now() + days * 86400000).toISOString();
@@ -56,8 +62,10 @@ export default async function handler(req, res) {
         return res.status(200).json({ success: true });
       }
       if (body.action === "edit") {
-        const username = String(body.username || "").trim().slice(0, 80), product = String(body.product || "");
-        if (!username || !PRODUCTS.includes(product)) return res.status(400).json({ error: "Nama user dan produk wajib valid." });
+        const username = String(body.username || "").trim().slice(0, 80);
+        const productInput = typeof body.product === "string" ? body.product.trim() : "";
+        const product = PRODUCTS.get(productInput.toLowerCase());
+        if (!username || !product) return res.status(400).json({ error: "Nama user dan produk wajib valid." });
         await db.batch([
           { sql: "UPDATE license_keys SET user_name=?,product=? WHERE id=?", args: [username, product, id] },
           log(session, "EDIT_KEY", `${item.key_code} · ${username} · ${product}`), revision
