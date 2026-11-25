@@ -11,7 +11,8 @@ export default async function handler(req, res) {
     if (req.method === "POST") {
       const { username, password, role } = req.body || {};
       const name = String(username || "").trim();
-      if (!/^[a-zA-Z0-9_.-]{3,32}$/.test(name) || typeof password !== "string" || password.length < 12) return res.status(400).json({ error: "Username 3–32 karakter; password minimal 12 karakter." });
+      if (!/^[a-zA-Z0-9_.-]{3,32}$/.test(name)) return res.status(400).json({ error: "Username harus 3–32 karakter." });
+      if (typeof password !== "string" || password.length === 0) return res.status(400).json({ error: "Password wajib diisi." });
       const allowed = session.role === "super_owner" ? ["owner", "reseller"] : ["reseller"];
       if (!allowed.includes(role)) return res.status(403).json({ error: "Role tersebut tidak boleh dibuat." });
       const hash = await bcrypt.hash(password, 12);
