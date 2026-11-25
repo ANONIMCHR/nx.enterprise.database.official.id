@@ -104,7 +104,6 @@ export async function bootstrapOwner() {
   if (!username || !password) return;
   const existing = await db.execute("SELECT id FROM staff WHERE role='super_owner' LIMIT 1");
   if (existing.rows.length) return;
-  if (password.length < 12) throw new Error("BOOTSTRAP_OWNER_PASSWORD minimal 12 karakter.");
   const hash = await bcrypt.hash(password, 12);
   await db.execute({ sql: "INSERT INTO staff(username,password,role) VALUES(?,?, 'super_owner')", args: [username, hash] });
 }
